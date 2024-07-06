@@ -1,11 +1,41 @@
 import Head from 'next/head';
 import Tabs from '../components/Tabs';
-import { ChangeEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Chip from '../components/Chip';
 import Select from '../components/Select';
+import { DevTool } from '@hookform/devtools';
 
-export default function Home() {
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+
+type IListingForm = {
+  category: string;
+  type: 'place_ask' | 'pre_order';
+  size: string;
+  condition: string;
+  equipment: string;
+  price: string;
+};
+
+const Home = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IListingForm>();
+
+  if (!isClient) return null;
+
+  const onSubmit: SubmitHandler<IListingForm> = (data) =>
+    alert(JSON.stringify(data));
 
   return (
     <div>
@@ -18,148 +48,186 @@ export default function Home() {
       <main className='pt-6 bg-gray-light-2'>
         <div className='grid grid-cols-2'>
           <section className='pl-6 pr-3'>
-            <h1>Add listing</h1>
-            <div className='flex flex-col gap-6'>
-              <div className='flex flex-col gap-8 px-6 py-8 bg-white rounded-2xl'>
-                <h2 className='text-lg font-bold'>Search a product to add</h2>
-                <Select
-                  label='Category'
-                  options={[
-                    { label: 'Size 1', value: '1' },
-                    { label: 'Size 2', value: '2' },
-                    { label: 'Size 3', value: '3' },
-                  ]}
-                  onChange={() => undefined}
-                />
-              </div>
-
-              <div className='flex flex-col gap-6 px-6 py-8 bg-white rounded-2xl'>
-                <div className='flex items-center gap-4'>
-                  <Chip text='1' />
-                  <div className='w-64 text-sm'>
-                    <Tabs
-                      items={['Place ask', 'Pre-order']}
-                      selectedTab={selectedTab}
-                      setSelectedTab={setSelectedTab}
-                    />
-                  </div>
-                </div>
-
-                {selectedTab === 0 ? (
-                  <div className='flex flex-col gap-4'>
-                    <div className='flex items-center gap-4'>
-                      <Chip text='2' />
-                      <div className='text-2xl font-bold'>Product detail</div>
-                    </div>
-
-                    <div className='grid grid-cols-2 gap-4'>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <h1>Add listing</h1>
+              <div className='flex flex-col gap-6'>
+                <div className='flex flex-col gap-8 px-6 py-8 bg-white rounded-2xl'>
+                  <h2 className='text-lg font-bold'>Search a product to add</h2>
+                  <Controller
+                    name='category'
+                    control={control}
+                    render={({ field: { value, onChange, name } }) => (
                       <Select
-                        label='Select size'
+                        label='Category'
+                        value={value}
                         options={[
                           { label: 'Size 1', value: '1' },
                           { label: 'Size 2', value: '2' },
                           { label: 'Size 3', value: '3' },
                         ]}
-                        onChange={() => undefined}
+                        onChange={onChange}
+                        name={name}
                       />
-                      <Select
-                        label='Condition'
-                        options={[
-                          { label: 'Size 1', value: '1' },
-                          { label: 'Size 2', value: '2' },
-                          { label: 'Size 3', value: '3' },
-                        ]}
-                        onChange={() => undefined}
-                      />
-                    </div>
+                    )}
+                  />
+                </div>
 
-                    <Select
-                      label='Equipment'
-                      options={[
-                        { label: 'Size 1', value: '1' },
-                        { label: 'Size 2', value: '2' },
-                        { label: 'Size 3', value: '3' },
-                      ]}
-                      onChange={() => undefined}
-                    />
-                    <div>Price</div>
-                    <div className='grid content-between grid-cols-3 gap-4'>
-                      <div className='flex flex-col items-center gap-2'>
-                        <div className='text-xs text-gray'>Lowest ask</div>
-                        <div className='text-sm text-black'>฿ X,XXX</div>
-                      </div>
-                      <div className='flex flex-col items-center gap-2'>
-                        <div className='text-xs text-gray'>Highest bid</div>
-                        <div className='text-sm text-black'>฿ X,XXX</div>
-                      </div>
-                      <div className='flex flex-col items-center gap-2'>
-                        <div className='text-xs text-gray'>Last sale</div>
-                        <div className='text-sm text-black'>฿ X,XXX</div>
-                      </div>
-                    </div>
-
-                    <div className='relative mb-4'>
-                      <input
-                        type='text'
-                        id='input-field'
-                        className='block w-full pt-4 pb-2 pl-3 border-gray-300 rounded-md shadow-sm min-h-14 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-                        placeholder='฿ 0'
+                <div className='flex flex-col gap-6 px-6 py-8 bg-white rounded-2xl'>
+                  <div className='flex items-center gap-4'>
+                    <Chip text='1' />
+                    <div className='w-64 text-sm'>
+                      <Tabs
+                        items={['Place ask', 'Pre-order']}
+                        selectedTab={selectedTab}
+                        setSelectedTab={setSelectedTab}
                       />
-                      <label
-                        htmlFor='input-field'
-                        className='absolute top-0 left-0 pt-1 pl-3 text-xs text-gray-500 transition-all transform pointer-events-none'
-                      >
-                        Label
-                      </label>
                     </div>
                   </div>
-                ) : (
-                  <div className='p-4 border-2 rounded-lg border-gray-light'>
-                    Pre-order
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {selectedTab === 0 && (
-              <div className='flex'>
-                <input type='checkbox' />
-                <div>Product has defect?</div>
-                <div>Icon</div>
-              </div>
-            )}
+                  {selectedTab === 0 ? (
+                    <div className='flex flex-col gap-4'>
+                      <div className='flex items-center gap-4'>
+                        <Chip text='2' />
+                        <div className='text-2xl font-bold'>Product detail</div>
+                      </div>
 
-            <div className='border-2 rounded-lg border-gray-light'>
-              <div>Images</div>
-              <div>A maximum of 10 images can be uploaded.</div>
-              <div className='flex items-center justify-center h-40 border-2 rounded-2xl'>
-                <div>Icon</div>
-                <div className='flex flex-col'>
-                  <div>Upload product images</div>
-                  <div>(Drag and drop to upload or browse files)</div>
+                      <div className='grid grid-cols-2 gap-4'>
+                        <Controller
+                          name='size'
+                          control={control}
+                          render={({ field: { value, onChange, name } }) => (
+                            <Select
+                              label='Select size'
+                              name={name}
+                              onChange={onChange}
+                              options={[
+                                { label: 'Size 1', value: '1' },
+                                { label: 'Size 2', value: '2' },
+                                { label: 'Size 3', value: '3' },
+                              ]}
+                              value={value}
+                            />
+                          )}
+                        />
+
+                        <Controller
+                          name='condition'
+                          control={control}
+                          render={({ field: { value, onChange, name } }) => (
+                            <Select
+                              label='Condition'
+                              name={name}
+                              onChange={onChange}
+                              options={[
+                                { label: 'Size 1', value: '1' },
+                                { label: 'Size 2', value: '2' },
+                                { label: 'Size 3', value: '3' },
+                              ]}
+                              value={value}
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <Controller
+                        name='equipment'
+                        control={control}
+                        render={({ field: { value, onChange, name } }) => (
+                          <Select
+                            label='Equipment'
+                            name={name}
+                            onChange={onChange}
+                            options={[
+                              { label: 'Size 1', value: '1' },
+                              { label: 'Size 2', value: '2' },
+                              { label: 'Size 3', value: '3' },
+                            ]}
+                            value={value}
+                          />
+                        )}
+                      />
+
+                      <div>Price</div>
+                      <div className='grid content-between grid-cols-3 gap-4'>
+                        <div className='flex flex-col items-center gap-2'>
+                          <div className='text-xs text-gray'>Lowest ask</div>
+                          <div className='text-sm text-black'>฿ X,XXX</div>
+                        </div>
+                        <div className='flex flex-col items-center gap-2'>
+                          <div className='text-xs text-gray'>Highest bid</div>
+                          <div className='text-sm text-black'>฿ X,XXX</div>
+                        </div>
+                        <div className='flex flex-col items-center gap-2'>
+                          <div className='text-xs text-gray'>Last sale</div>
+                          <div className='text-sm text-black'>฿ X,XXX</div>
+                        </div>
+                      </div>
+
+                      <div className='relative mb-4'>
+                        <input
+                          {...register('price')}
+                          type='number'
+                          id='input-field'
+                          className='block w-full pt-4 pb-2 pl-3 border-gray-300 rounded-md shadow-sm min-h-14 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+                          placeholder='฿ 0'
+                        />
+                        <label
+                          htmlFor='input-field'
+                          className='absolute top-0 left-0 pt-1 pl-3 text-xs text-gray-500 transition-all transform pointer-events-none'
+                        >
+                          Label
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='p-4 border-2 rounded-lg border-gray-light'>
+                      Pre-order
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-            <div className='grid grid-cols-3 gap-4'>
-              <div>Shipping address</div>
-              <div>
-                <div>SASOM User</div>
+
+              {selectedTab === 0 && (
+                <div className='flex'>
+                  <input type='checkbox' />
+                  <div>Product has defect?</div>
+                  <div>Icon</div>
+                </div>
+              )}
+
+              <div className='border-2 rounded-lg border-gray-light'>
+                <div>Images</div>
+                <div>A maximum of 10 images can be uploaded.</div>
+                <div className='flex items-center justify-center h-40 border-2 rounded-2xl'>
+                  <div>Icon</div>
+                  <div className='flex flex-col'>
+                    <div>Upload product images</div>
+                    <div>(Drag and drop to upload or browse files)</div>
+                  </div>
+                </div>
+              </div>
+              <div className='grid grid-cols-3 gap-4'>
+                <div>Shipping address</div>
                 <div>
-                  (+66123456789) 101 ถนน สุขุมวิท 101/1 Khwaeng Bang Chak, Phra
-                  Khanong,Bangkok 10260
+                  <div>SASOM User</div>
+                  <div>
+                    (+66123456789) 101 ถนน สุขุมวิท 101/1 Khwaeng Bang Chak,
+                    Phra Khanong,Bangkok 10260
+                  </div>
                 </div>
+                <div>Edit</div>
               </div>
-              <div>Edit</div>
-            </div>
-            <div>
-              <div>Total payout</div>
-            </div>
-            <button
-              type='submit'
-              className='px-4 py-2 font-bold bg-blue-500 rounded text-grey hover:bg-blue-700'
-            >
-              Submit
-            </button>
+              <div>
+                <div>Total payout</div>
+              </div>
+              <button
+                type='submit'
+                className='px-4 py-2 font-bold bg-blue-500 rounded text-grey hover:bg-blue-700'
+              >
+                Submit
+              </button>
+            </form>
+            <DevTool control={control} />
           </section>
 
           <section className='flex flex-col gap-6 pl-3 pr-6'>
@@ -184,4 +252,6 @@ export default function Home() {
       </main>
     </div>
   );
-}
+};
+
+export default Home;
