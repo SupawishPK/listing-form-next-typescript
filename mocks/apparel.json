@@ -1,0 +1,26 @@
+[
+  {
+    "size": "xxxs",
+    "sizeText": "XXXS"
+  },
+  {
+    "size": "xxs",
+    "sizeText": "XXS"
+  },
+  {
+    "size": "xs",
+    "sizeText": "XS"
+  },
+  {
+    "size": "s",
+    "sizeText": "S"
+  },
+  {
+    "size": "m",
+    "sizeText": "M"
+  },
+  {
+    "size": "l",
+    "sizeText": "L"
+  }
+]
