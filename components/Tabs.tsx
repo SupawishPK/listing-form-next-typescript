@@ -5,10 +5,10 @@ import { useEffect, useRef } from 'react';
 interface IProps {
   items: string[];
   selectedTab: number;
-  setSelectedTab: (index: number) => void;
+  onChange: (index: number) => void;
 }
 
-const Tabs = ({ items, selectedTab, setSelectedTab }: IProps) => {
+const Tabs = ({ items, selectedTab, onChange }: IProps) => {
   const firstBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const Tabs = ({ items, selectedTab, setSelectedTab }: IProps) => {
           <button
             ref={index === 0 ? firstBtnRef : null}
             key={index}
-            onClick={() => setSelectedTab(index)}
+            onClick={() => onChange(index)}
             className={`w-full rounded-xl p-2 text-center outline-none hover:bg-white focus:bg-white ${
               selectedTab === index ? 'bg-white text-black' : ''
             }`}

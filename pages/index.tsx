@@ -29,6 +29,7 @@ const Home = () => {
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<IListingForm>();
 
@@ -36,6 +37,11 @@ const Home = () => {
 
   const onSubmit: SubmitHandler<IListingForm> = (data) =>
     alert(JSON.stringify(data));
+
+  const onChangeTap = (index: number) => {
+    setSelectedTab(index);
+    setValue('type', index === 0 ? 'place_ask' : 'pre_order');
+  };
 
   return (
     <div>
@@ -79,7 +85,7 @@ const Home = () => {
                       <Tabs
                         items={['Place ask', 'Pre-order']}
                         selectedTab={selectedTab}
-                        setSelectedTab={setSelectedTab}
+                        onChange={onChangeTap}
                       />
                     </div>
                   </div>
