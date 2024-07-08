@@ -96,6 +96,89 @@ const hasShippingDetailError = (
   return 'shippingDetail' in errors;
 };
 
+const PriceSummary = () => (
+  <div className='flex flex-col gap-6 px-6 py-8 bg-white rounded-2xl'>
+    <div className='grid grid-cols-2 gap-4'>
+      <div className='text-sm text-gray'>Subtotal</div>
+      <div className='text-right'>฿ X,XXX</div>
+
+      <div className='text-sm text-gray'>Shipping fee</div>
+      <div className='text-right'>฿ ---</div>
+
+      <div className='text-sm text-gray'>Transaction fee</div>
+      <div className='text-right'>฿ XXX</div>
+
+      <div className='text-sm text-gray'>Payment processing fee</div>
+      <div className='text-right'>฿ XXX</div>
+
+      <div className='text-lg font-semibold text-green'>Total payout</div>
+      <div className='font-semibold text-right text-green'>฿ X,XXX </div>
+    </div>
+
+    <div className='flex gap-2 px-4 py-2 rounded-lg bg-gray-light-2'>
+      <Image src={InformationCircle} alt='information-circle' />
+      <p className='text-xs text-gray'>
+        Shipping fee will be based on the shipping method selected when
+        confirming order.
+      </p>
+    </div>
+  </div>
+);
+
+const ShippingAddress = () => (
+  <div className='flex px-6 py-8 bg-white rounded-2xl'>
+    <h2 className='flex-grow text-lg font-bold'>Shipping address</h2>
+    <div className='max-w-56'>
+      <p className='text-base font-medium'>SASOM User</p>
+      <p className='mt-4 text-xs font-medium text-gray'>
+        (+66123456789) 101 ถนน สุขุมวิท 101/1 Khwaeng Bang Chak, Phra
+        Khanong,Bangkok 10260
+      </p>
+    </div>
+    <div className='flex items-start justify-end w-10'>
+      <Image src={PencilIcon} alt='pencil-icon' width={20} height={20} />
+    </div>
+  </div>
+);
+
+const ImageUpload = ({ type }: { type: 'place_ask' | 'pre_order' }) => (
+  <div className='px-6 py-8 bg-white rounded-2xl'>
+    <h2 className='text-lg font-bold'>Images</h2>
+    {type === 'place_ask' ? (
+      <p className='mt-1 text-gray'>A maximum of 10 images can be uploaded.</p>
+    ) : (
+      <p className='mt-1 text-gray'>Images will appear in website.</p>
+    )}
+    <div className='flex items-center justify-center h-40 gap-4 mt-4 border-2 rounded-2xl border-gray-light'>
+      <div className='flex justify-center w-16 h-16 rounded-full bg-gray-light'>
+        <Image src={UploadIcon} alt='upload-icon' width={20} height={20} />
+      </div>
+      <div className='flex flex-col'>
+        <p className='text-lg font-bold'>Upload product images</p>
+        <p className='text-sm text-gray'>
+          (Drag and drop to upload or{' '}
+          <span className='underline'>browse files</span>)
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+const DefectCheckbox = () => (
+  <div className='flex items-center gap-2'>
+    <input type='checkbox' className='w-4 h-4' />
+    <div>Product has defect?</div>
+    <div>
+      <Image
+        src={InformationCircle}
+        width={20}
+        height={20}
+        alt='information-circle'
+      />
+    </div>
+  </div>
+);
+
 const Home = () => {
   const [isClient, setIsClient] = useState(false);
 
@@ -145,9 +228,10 @@ const Home = () => {
       ...prevItems,
       {
         ...data,
-        name: 'Nike Air Max 90',
+        name: 'Nike Dunk Low Retro White Black',
       },
     ]);
+    reset();
   };
 
   const onChangeTap = (index: number) => {
@@ -499,82 +583,24 @@ const Home = () => {
                   </div>
                 )}
 
-                {watch('type') === 'place_ask' && (
-                  <div className='flex items-center gap-2'>
-                    <input type='checkbox' className='w-4 h-4' />
-                    <div>Product has defect?</div>
-                    <div>
-                      <Image
-                        src={InformationCircle}
-                        width={20}
-                        height={20}
-                        alt='information-circle'
-                      />
-                    </div>
-                  </div>
-                )}
+                {watch('type') === 'place_ask' && <DefectCheckbox />}
 
-                <div className='px-6 py-8 bg-white rounded-2xl'>
-                  <h2 className='text-lg font-bold'>Images</h2>
-                  <p className='mt-1 text-gray'>
-                    Images will appear in website.
-                  </p>
-                  <div className='flex items-center justify-center h-40 gap-4 mt-4 border-2 rounded-2xl border-gray-light'>
-                    <div className='flex justify-center w-16 h-16 rounded-full bg-gray-light'>
-                      <Image
-                        src={UploadIcon}
-                        alt='upload-icon'
-                        width={20}
-                        height={20}
-                      />
-                    </div>
-                    <div className='flex flex-col'>
-                      <p className='text-lg font-bold'>Upload product images</p>
-                      <p className='text-sm text-gray'>
-                        (Drag and drop to upload or{' '}
-                        <span className='underline'>browse files</span>)
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <ImageUpload type={watch('type')} />
 
-                <div className='flex px-6 py-8 bg-white rounded-2xl'>
-                  <h2 className='flex-grow text-lg font-bold'>
-                    Shipping address
-                  </h2>
-                  <div className='max-w-56'>
-                    <p className='text-base font-medium'>SASOM User</p>
-                    <p className='text-xs font-medium text-gray'>
-                      (+66123456789) 101 ถนน สุขุมวิท 101/1 Khwaeng Bang Chak,
-                      Phra Khanong,Bangkok 10260
-                    </p>
-                  </div>
-                  <div className='flex items-start justify-end w-10'>
-                    <Image
-                      src={PencilIcon}
-                      alt='pencil-icon'
-                      width={20}
-                      height={20}
-                    />
-                  </div>
-                </div>
+                <ShippingAddress />
 
-                <div>
-                  <div>Total payout</div>
-                </div>
+                <PriceSummary />
 
-                <div>
-                  <Button
-                    className='text-base bg-gray-dark-2 w-52 text-gray'
-                    type='submit'
-                    color='primary'
-                    endContent={
-                      <Image src={RightFilledIcon} alt='right-filled' />
-                    }
-                  >
-                    Add listing
-                  </Button>
-                </div>
+                <Button
+                  className='text-base bg-gray-dark-2 w-52 text-gray'
+                  type='submit'
+                  color='primary'
+                  endContent={
+                    <Image src={RightFilledIcon} alt='right-filled' />
+                  }
+                >
+                  Add listing
+                </Button>
               </div>
             </form>
             <DevTool control={control} />

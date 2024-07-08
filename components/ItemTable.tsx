@@ -7,6 +7,7 @@ import {
   TableCell,
 } from '@nextui-org/table';
 import DocumentIcon from '../assets/icons/document.svg';
+import Nike from '../assets/nike.jpeg';
 import Image from 'next/image';
 
 interface IPlaceAskItem {
@@ -75,9 +76,21 @@ const ItemTable = ({ items }: IProps) => {
       >
         {items.map((item, index) => (
           <TableRow key={index}>
-            <TableCell>{item.name}</TableCell>
+            <TableCell className='flex gap-4'>
+              <Image src={Nike} alt='Nike' width={40} height={40} />
+              <div>
+                <p className='w-40 overflow-hidden text-sm overflow-ellipsis whitespace-nowrap'>
+                  {item.name}
+                </p>
+                <p className='text-sm text-gray'>
+                  {item.type === 'place_ask'
+                    ? 'ASK | {SKU}'
+                    : 'Pre-order | {SKU}'}
+                </p>
+              </div>
+            </TableCell>
             <TableCell>
-              {item.productDetail.size}, {item.productDetail.condition}
+              {item.productDetail.size}| {item.productDetail.condition}
             </TableCell>
             <TableCell>{item.productDetail.price}</TableCell>
             <TableCell>

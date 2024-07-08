@@ -17,6 +17,7 @@ module.exports = {
       'gray-light-2': '#F8F9FA',
       white: '#FFFFFF',
       error: '#FF0000',
+      green: '#00B900',
     },
     extend: {},
   },
