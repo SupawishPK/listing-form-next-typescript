@@ -2,12 +2,16 @@ import Head from 'next/head';
 import Tabs from '../components/Tabs';
 import { useEffect, useState } from 'react';
 import Chip from '../components/Chip';
-import Select from '../components/Select';
 import { DevTool } from '@hookform/devtools';
 import InformationCircle from '../assets/icons/information-circle.svg';
-import Upload from '../assets/icons/upload.svg';
-import Pencil from '../assets/icons/pencil.svg';
+import UploadIcon from '../assets/icons/upload.svg';
+import PencilIcon from '../assets/icons/pencil.svg';
+import RightFilledIcon from '../assets/icons/rightFilled.svg';
 import Conditions from '../mocks/condition.json';
+import Quantity from '../mocks/Quantity.json';
+import { Button } from '@nextui-org/button';
+import { Input } from '@nextui-org/input';
+import { Select, SelectItem } from '@nextui-org/select';
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,10 +20,10 @@ import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import Category from '../mocks/category.json';
 import getSizeOptionsByCategory from '../utils/getSizeOptionsByCategory';
-import Input from '../components/Input';
-import getEquipmentOptionsByCategory from '../utils/getEquipmentOptionsByCategory';
 
-// Define the Zod schemas for the productDetail and shippingDetail structures
+import getEquipmentOptionsByCategory from '../utils/getEquipmentOptionsByCategory';
+import ItemTable, { IItems } from '../components/ItemTable';
+
 const productDetailSchema = z.object({
   size: z.string().min(1, 'Size is required'),
   condition: z.string().min(1, 'Condition is required'),
@@ -31,19 +35,18 @@ const productDetailSchema = z.object({
 });
 
 const shippingDetailSchema = z.object({
-  startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().min(1, 'End date is required'),
   shipDuration: z.string().min(1, 'Shipping duration is required'),
+  startDate: z.string().min(1, 'Start date is required'),
 });
 
-// Define the Zod schemas for the IPlaceAskForm and IPreOrderForm
 const placeAskFormSchema = z.object({
   type: z.literal('place_ask'),
   productDetail: productDetailSchema.pick({
-    size: true,
     condition: true,
     equipment: true,
     price: true,
+    size: true,
   }),
 });
 
@@ -51,14 +54,13 @@ const preOrderFormSchema = z.object({
   type: z.literal('pre_order'),
   shippingDetail: shippingDetailSchema,
   productDetail: productDetailSchema.pick({
-    size: true,
     condition: true,
-    quantity: true,
     price: true,
+    quantity: true,
+    size: true,
   }),
 });
 
-// Define the IListingForm schema
 const listingFormSchema = z
   .object({
     category: z.string().min(1, 'Category is required'),
@@ -102,14 +104,15 @@ const Home = () => {
   }, []);
 
   const {
+    clearErrors,
     control,
-    register,
-    handleSubmit,
-    setValue,
     formState: { errors },
-    watch,
     getValues,
+    handleSubmit,
+    register,
     reset,
+    setValue,
+    watch,
   } = useForm<IListingFormType>({
     resolver: zodResolver(listingFormSchema),
     defaultValues: {
@@ -128,13 +131,23 @@ const Home = () => {
     watch('type') === 'place_ask' ? 0 : 1
   );
 
+  const [items, setItems] = useState<IItems>([]);
+
+  const isItemsEmpty = items.length === 0;
+
   const sizeOptions = getSizeOptionsByCategory(watch('category'));
   const equipmentOptions = getEquipmentOptionsByCategory(watch('category'));
 
   if (!isClient) return null;
 
   const onSubmit: SubmitHandler<IListingFormType> = (data) => {
-    alert(JSON.stringify(data));
+    setItems((prevItems) => [
+      ...prevItems,
+      {
+        ...data,
+        name: 'Nike Air Max 90',
+      },
+    ]);
   };
 
   const onChangeTap = (index: number) => {
@@ -177,21 +190,36 @@ const Home = () => {
         <meta name='description' content='Listing form' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <main className='pt-6 bg-gray-light-2'>
+      <main className='py-8 pt-6 bg-gray-light-2'>
         <div className='grid grid-cols-2'>
           <section className='pl-20 pr-3'>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <h1>Add listing</h1>
-              <div className='flex flex-col gap-6'>
+              <h1 className='text-3xl font-bold'>Add listing</h1>
+              <div className='flex flex-col gap-6 mt-12'>
                 <div className='flex flex-col gap-8 px-6 py-8 bg-white rounded-2xl'>
                   <h2 className='text-lg font-bold'>Search a product to add</h2>
 
                   <Select
                     {...register('category')}
-                    aria-label='Category'
-                    options={Category}
+                    variant='bordered'
+                    label='Category'
                     placeholder='Category'
-                  />
+                    isInvalid={errors.category?.message !== undefined}
+                    errorMessage={errors.category?.message}
+                    fullWidth
+                    onChange={(e) => {
+                      const category = e.target.value;
+                      reset();
+                      setValue('category', category);
+                      clearErrors();
+                    }}
+                  >
+                    {Category.map(({ label, value }) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
 
                 <div className='flex flex-col gap-6 px-6 py-8 bg-white rounded-2xl'>
@@ -214,40 +242,74 @@ const Home = () => {
                       </div>
 
                       <div className='grid grid-cols-2 gap-4'>
-                        <Select
-                          {...register('productDetail.size')}
-                          aria-label='Select size'
-                          options={sizeOptions}
-                          placeholder='Size'
-                          aria-errormessage={
-                            errors.productDetail?.size?.message
-                          }
-                        />
+                        <div className='col-span-1'>
+                          <Select
+                            {...register('productDetail.size')}
+                            variant='bordered'
+                            label='Select size'
+                            placeholder='Size'
+                            isInvalid={
+                              errors.productDetail?.size?.message !== undefined
+                            }
+                            errorMessage={errors.productDetail?.size?.message}
+                          >
+                            {sizeOptions.map(({ label, value }) => (
+                              <SelectItem key={value} value={value}>
+                                {label}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                        </div>
+                        <div className='col-span-1'>
+                          <Select
+                            {...register('productDetail.condition')}
+                            variant='bordered'
+                            label='Condition'
+                            placeholder='Condition'
+                            isInvalid={
+                              hasConditionError(errors) &&
+                              errors.productDetail?.condition?.message !==
+                                undefined
+                            }
+                            errorMessage={
+                              hasConditionError(errors)
+                                ? errors.productDetail?.condition?.message
+                                : undefined
+                            }
+                          >
+                            {Conditions.map(({ label, value }) => (
+                              <SelectItem key={value} value={value}>
+                                {label}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                        </div>
 
-                        <Select
-                          {...register('productDetail.condition')}
-                          aria-label='Condition'
-                          options={Conditions}
-                          placeholder='Condition'
-                          aria-errormessage={
-                            hasConditionError(errors)
-                              ? errors.productDetail?.condition?.message
-                              : undefined
-                          }
-                        />
+                        <div className='col-span-2'>
+                          <Select
+                            {...register('productDetail.equipment')}
+                            variant='bordered'
+                            label='Equipment'
+                            placeholder='Equipment'
+                            isInvalid={
+                              hasEquipmentError(errors) &&
+                              errors.productDetail?.equipment?.message !==
+                                undefined
+                            }
+                            errorMessage={
+                              hasEquipmentError(errors)
+                                ? errors.productDetail?.equipment?.message
+                                : undefined
+                            }
+                          >
+                            {equipmentOptions.map(({ label, value }) => (
+                              <SelectItem key={value} value={value}>
+                                {label}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                        </div>
                       </div>
-
-                      <Select
-                        {...register('productDetail.equipment')}
-                        aria-label='Equipment'
-                        options={equipmentOptions}
-                        placeholder='Equipment'
-                        aria-errormessage={
-                          hasEquipmentError(errors)
-                            ? errors.productDetail?.equipment?.message
-                            : undefined
-                        }
-                      />
 
                       <div>Price</div>
                       <div className='grid content-between grid-cols-3 gap-4'>
@@ -269,8 +331,12 @@ const Home = () => {
                         type='number'
                         {...register('productDetail.price')}
                         placeholder='฿ 0'
-                        aria-label='Input price'
-                        aria-errormessage={errors.productDetail?.price?.message}
+                        label='Input price'
+                        variant='bordered'
+                        isInvalid={
+                          errors.productDetail?.price?.message !== undefined
+                        }
+                        errorMessage={errors.productDetail?.price?.message}
                       />
                     </div>
                   ) : (
@@ -283,13 +349,19 @@ const Home = () => {
                         <h2 className='text-lg font-bold'>
                           Pre-order duration
                         </h2>
-                        <div>
+                        <div className='flex items-center gap-4'>
                           <Input
                             type='date'
                             {...register('shippingDetail.startDate')}
-                            aria-label='Pre-order duration'
                             placeholder='Start date'
-                            aria-errormessage={
+                            variant='bordered'
+                            label='Pre-order duration'
+                            isInvalid={
+                              hasShippingDetailError(errors) &&
+                              errors.shippingDetail?.startDate?.message !==
+                                undefined
+                            }
+                            errorMessage={
                               hasShippingDetailError(errors)
                                 ? errors.shippingDetail?.startDate?.message
                                 : undefined
@@ -299,9 +371,15 @@ const Home = () => {
                           <Input
                             type='date'
                             {...register('shippingDetail.endDate')}
-                            aria-label='Pre-order duration'
+                            label='Pre-order duration'
                             placeholder='End date'
-                            aria-errormessage={
+                            variant='bordered'
+                            isInvalid={
+                              hasShippingDetailError(errors) &&
+                              errors.shippingDetail?.endDate?.message !==
+                                undefined
+                            }
+                            errorMessage={
                               hasShippingDetailError(errors)
                                 ? errors.shippingDetail?.endDate?.message
                                 : undefined
@@ -317,9 +395,15 @@ const Home = () => {
                       <Input
                         type='number'
                         {...register('shippingDetail.shipDuration')}
-                        placeholder='฿ 0'
-                        aria-label='Ship within (Day)'
-                        aria-errormessage={
+                        placeholder='Ship within (Day)'
+                        label='Ship within (Day)'
+                        variant='bordered'
+                        isInvalid={
+                          hasShippingDetailError(errors) &&
+                          errors.shippingDetail?.shipDuration?.message !==
+                            undefined
+                        }
+                        errorMessage={
                           hasShippingDetailError(errors)
                             ? errors.shippingDetail?.shipDuration?.message
                             : undefined
@@ -345,36 +429,43 @@ const Home = () => {
                       <div className='grid grid-cols-2 gap-4'>
                         <Select
                           {...register('productDetail.size')}
-                          aria-label='Select size'
-                          options={sizeOptions}
+                          variant='bordered'
+                          label='Select size'
                           placeholder='Size'
-                          aria-errormessage={
-                            errors.productDetail?.size?.message
+                          isInvalid={
+                            errors.productDetail?.size?.message !== undefined
                           }
-                        />
+                          errorMessage={errors.productDetail?.size?.message}
+                        >
+                          {sizeOptions.map(({ label, value }) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </Select>
 
                         <Select
                           {...register('productDetail.quantity')}
-                          aria-label='Quantity'
-                          options={[
-                            { label: '1', value: '1' },
-                            { label: '2', value: '2' },
-                            { label: '3', value: '3' },
-                            { label: '4', value: '4' },
-                            { label: '5', value: '5' },
-                            { label: '6', value: '6' },
-                            { label: '7', value: '7' },
-                            { label: '8', value: '8' },
-                            { label: '9', value: '9' },
-                            { label: '10', value: '10' },
-                          ]}
+                          variant='bordered'
+                          label='Quantity'
                           placeholder='Quantity'
-                          aria-errormessage={
+                          isInvalid={
+                            hasQuantityError(errors) &&
+                            errors.productDetail?.quantity?.message !==
+                              undefined
+                          }
+                          errorMessage={
                             hasQuantityError(errors)
                               ? errors.productDetail?.quantity?.message
                               : undefined
                           }
-                        />
+                        >
+                          {Quantity.map(({ label, value }) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </Select>
                       </div>
 
                       <div>Price</div>
@@ -396,15 +487,19 @@ const Home = () => {
                       <Input
                         type='number'
                         {...register('productDetail.price')}
-                        aria-label='Input price'
+                        label='Input price'
+                        variant='bordered'
                         placeholder='฿ 0'
-                        aria-errormessage={errors.productDetail?.price?.message}
+                        isInvalid={
+                          errors.productDetail?.price?.message !== undefined
+                        }
+                        errorMessage={errors.productDetail?.price?.message}
                       />
                     </div>
                   </div>
                 )}
 
-                {selectedTab === 0 && (
+                {watch('type') === 'place_ask' && (
                   <div className='flex items-center gap-2'>
                     <input type='checkbox' className='w-4 h-4' />
                     <div>Product has defect?</div>
@@ -427,7 +522,7 @@ const Home = () => {
                   <div className='flex items-center justify-center h-40 gap-4 mt-4 border-2 rounded-2xl border-gray-light'>
                     <div className='flex justify-center w-16 h-16 rounded-full bg-gray-light'>
                       <Image
-                        src={Upload}
+                        src={UploadIcon}
                         alt='upload-icon'
                         width={20}
                         height={20}
@@ -456,7 +551,7 @@ const Home = () => {
                   </div>
                   <div className='flex items-start justify-end w-10'>
                     <Image
-                      src={Pencil}
+                      src={PencilIcon}
                       alt='pencil-icon'
                       width={20}
                       height={20}
@@ -469,12 +564,16 @@ const Home = () => {
                 </div>
 
                 <div>
-                  <button
+                  <Button
+                    className='text-base bg-gray-dark-2 w-52 text-gray'
                     type='submit'
-                    className='px-4 py-2 font-bold bg-blue-500 rounded text-grey hover:bg-blue-700'
+                    color='primary'
+                    endContent={
+                      <Image src={RightFilledIcon} alt='right-filled' />
+                    }
                   >
-                    Submit
-                  </button>
+                    Add listing
+                  </Button>
                 </div>
               </div>
             </form>
@@ -484,20 +583,24 @@ const Home = () => {
           <section className='flex flex-col gap-6 pl-3 pr-6'>
             <div className='flex'>
               <div className='grow'>
-                <div>Total</div>
-                <div>0 Item</div>
+                <p className='text-sm text-gray'>Total</p>
+                <div className='text-2xl font-bold'>{items.length} Items</div>
               </div>
-              <div>
-                <button className='px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700'>
+              <div className='flex gap-4'>
+                <Button color='danger' variant='bordered'>
                   Cancel
-                </button>
-                <button className='px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700'>
+                </Button>
+                <Button
+                  className={`${isItemsEmpty ? 'bg-gray-light text-black' : 'bg-black text-white'}`}
+                  disabled={isItemsEmpty}
+                  onClick={() => console.log('----ITEMS----:', items)}
+                >
                   Submit
-                </button>
+                </Button>
               </div>
             </div>
 
-            <div>table</div>
+            <ItemTable items={items} />
           </section>
         </div>
       </main>
