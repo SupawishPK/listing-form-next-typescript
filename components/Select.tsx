@@ -1,36 +1,42 @@
-import React, { ChangeEvent } from 'react';
+/* eslint-disable react/display-name */
+import { DetailedHTMLProps, forwardRef, SelectHTMLAttributes } from 'react';
 
-interface IProps {
-  options: { label: string; value: string }[];
-  value?: string;
-  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
-  name?: string;
-  label: string;
-}
-
-const Select = ({ options, value, onChange, name, label }: IProps) => {
-  return (
-    <div className='relative mb-4'>
-      <select
-        value={value}
-        onChange={onChange}
-        name={name}
-        className='block w-full py-2 pl-3 pr-10 border-gray-300 rounded-md shadow-sm min-h-14 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <label
-        htmlFor='select-field'
-        className='absolute top-0 left-0 pt-1 pl-3 text-xs text-gray-500 transition-all transform pointer-events-none'
-      >
-        {label}
-      </label>
-    </div>
-  );
+type IProps = DetailedHTMLProps<
+  SelectHTMLAttributes<HTMLSelectElement>,
+  HTMLSelectElement
+> & {
+  options: { label: string; value: string | number }[];
+  placeholder: string;
 };
+
+const Select = forwardRef<HTMLSelectElement, IProps>((props, ref) => (
+  <div className='relative mb-4'>
+    <select
+      ref={ref}
+      {...props}
+      className={`block min-h-14 w-full rounded-md border-2 ${props['aria-errormessage'] ? 'border-error' : 'border-gray-light'} pb-2 pl-2 pt-4 text-black`}
+    >
+      <option value='' disabled selected>
+        {props.placeholder}
+      </option>
+      {props.options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+    <label
+      htmlFor={props.id}
+      className='pointer-events-none absolute left-0 top-0 transform pl-3.5 pt-1 text-xs text-gray transition-all'
+    >
+      {props['aria-label']}
+    </label>
+    {props['aria-errormessage'] && (
+      <p className='bottom-0 left-0 pl-3 text-xs text-error'>
+        {props['aria-errormessage']}
+      </p>
+    )}
+  </div>
+));
 
 export default Select;

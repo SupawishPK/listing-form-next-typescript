@@ -16,11 +16,11 @@
     "sizeText": "6 US"
   },
   {
-    "size": 6.5,
+    "size": "6.5",
     "sizeText": "6.5 US"
   },
   {
-    "size": 7,
+    "size": "7",
     "sizeText": "7 US"
   }
 ]

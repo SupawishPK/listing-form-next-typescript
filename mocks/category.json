@@ -1,1 +1,22 @@
-["shoes", "apparel", "collectibles", "accessories", "bags"]
+[
+  {
+    "label": "shoes",
+    "value": "shoes"
+  },
+  {
+    "label": "apparel",
+    "value": "apparel"
+  },
+  {
+    "label": "collectibles",
+    "value": "collectibles"
+  },
+  {
+    "label": "accessories",
+    "value": "accessories"
+  },
+  {
+    "label": "bags",
+    "value": "bags"
+  }
+]

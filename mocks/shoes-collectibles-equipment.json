@@ -1,0 +1,10 @@
+[
+  {
+    "equipment": "ORIGINAL_BOX_NO_DEFECT",
+    "equipmentText": "Box"
+  },
+  {
+    "equipment": "ORIGINAL_BOX_WITH_DEFECT",
+    "equipmentText": "Box (defect)"
+  }
+]

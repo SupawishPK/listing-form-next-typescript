@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+// import { useEffect, useRef } from 'react';
 
 interface IProps {
   items: string[];
@@ -9,20 +9,20 @@ interface IProps {
 }
 
 const Tabs = ({ items, selectedTab, onChange }: IProps) => {
-  const firstBtnRef = useRef<HTMLButtonElement>(null);
+  // const firstBtnRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (firstBtnRef.current) {
-      firstBtnRef.current.focus();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (firstBtnRef.current) {
+  //     firstBtnRef.current.focus();
+  //   }
+  // }, []);
 
   return (
     <div className='flex flex-col w-full max-w-md gap-y-2'>
-      <div className='flex items-center justify-between p-1 text-gray-dark bg-gray-light gap-x-1 rounded-xl'>
+      <div className='flex items-center justify-between p-1 gap-x-1 rounded-xl bg-gray-light text-gray-dark'>
         {items.map((item, index) => (
-          <button
-            ref={index === 0 ? firstBtnRef : null}
+          <div
+            // ref={index === 0 ? firstBtnRef : null}
             key={index}
             onClick={() => onChange(index)}
             className={`w-full rounded-xl p-2 text-center outline-none hover:bg-white focus:bg-white ${
@@ -32,7 +32,7 @@ const Tabs = ({ items, selectedTab, onChange }: IProps) => {
             role='tab'
           >
             {item}
-          </button>
+          </div>
         ))}
       </div>
     </div>

@@ -1,0 +1,22 @@
+[
+  {
+    "equipment": "DETAILS_DUST_BAG",
+    "equipmentText": "Dust bag"
+  },
+  {
+    "equipment": "DETAILS_CARD_CERT",
+    "equipmentText": "Card/Certificate"
+  },
+  {
+    "equipment": "DETAILS_BOX",
+    "equipmentText": "Box"
+  },
+  {
+    "equipment": "DETAILS_RECEIPT",
+    "equipmentText": "Receipt"
+  },
+  {
+    "equipment": "DETAILS_PAPER_BAG",
+    "equipmentText": "Paper bag"
+  }
+]

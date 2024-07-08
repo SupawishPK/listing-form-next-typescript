@@ -12,6 +12,7 @@ module.exports = {
       'gray-light': '#F3F4F6',
       'gray-light-2': '#F8F9FA',
       white: '#FFFFFF',
+      error: '#FF0000',
     },
     extend: {},
   },
