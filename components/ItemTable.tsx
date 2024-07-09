@@ -14,6 +14,10 @@ import mapConditionToDisplay from '../utils/mapConditionToDisplay';
 import displayPriceFormat from '../utils/displayPriceFormat';
 import { Chip } from '@nextui-org/chip';
 import displayTypeFormat from '../utils/displayTypeFormat';
+import { useCallback, useMemo, useState } from 'react';
+import leftFilledIcon from '../assets/icons/leftFilled.svg';
+import rightFilledIcon from '../assets/icons/rightFilled.svg';
+import { Button } from '@nextui-org/button';
 
 export type ICategory =
   | 'shoes'
@@ -60,6 +64,66 @@ interface IProps {
 }
 
 const ItemTable = ({ items }: IProps) => {
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 3;
+  const pages = Math.ceil(items.length / rowsPerPage);
+
+  const onNextPage = useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const bottomContent = useMemo(() => {
+    return (
+      <div className='flex items-center justify-end pb-5 -mt-4 bg-white gap-7 rounded-b-xl'>
+        <p className='text-xs text-gray'>
+          Rows per page: <b className='font-medium text-black'>{rowsPerPage}</b>
+        </p>
+        <p className='text-xs font-medium'>
+          {`${(page - 1) * rowsPerPage + 1}-${
+            page * rowsPerPage > items.length
+              ? items.length
+              : page * rowsPerPage
+          } of ${items.length}`}
+        </p>
+        <div>
+          <Button
+            isDisabled={pages === 1}
+            size='sm'
+            variant='light'
+            onPress={onPreviousPage}
+            className='w-10'
+          >
+            <Image src={leftFilledIcon} alt='Left Filled Icon' />
+          </Button>
+          <Button
+            isDisabled={pages === 1}
+            size='sm'
+            variant='light'
+            onPress={onNextPage}
+            className='w-10'
+          >
+            <Image src={rightFilledIcon} alt='Left Filled Icon' />
+          </Button>
+        </div>
+      </div>
+    );
+  }, [items.length, onNextPage, onPreviousPage, page, pages, rowsPerPage]);
+
+  const itemsToDisplay = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return items.slice(start, end);
+  }, [items, page, rowsPerPage]);
+
   return (
     <Table
       color='default'
@@ -71,6 +135,7 @@ const ItemTable = ({ items }: IProps) => {
         th: 'text-black font-bold',
         tr: 'even:bg-gray-light',
       }}
+      bottomContent={bottomContent}
     >
       <TableHeader>
         <TableColumn>PRODUCT NAME</TableColumn>
@@ -93,7 +158,7 @@ const ItemTable = ({ items }: IProps) => {
           </div>
         }
       >
-        {items.map((item, index) => (
+        {itemsToDisplay.map((item, index) => (
           <TableRow key={index}>
             <TableCell className='flex gap-4'>
               <Image src={Nike} alt='Nike' width={40} height={40} />

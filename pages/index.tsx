@@ -216,7 +216,126 @@ const Home = () => {
     watch('type') === 'place_ask' ? 0 : 1
   );
 
-  const [items, setItems] = useState<IItems>([]);
+  const [items, setItems] = useState<IItems>([
+    {
+      category: 'apparel',
+      type: 'place_ask',
+      productDetail: {
+        condition: 'like_new',
+        equipment: 'DETAILS_TAG',
+        price: '123',
+        size: 'xxxs',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'place_ask',
+      productDetail: {
+        condition: 'brand_new',
+        equipment: 'ORIGINAL_BOX_NO_DEFECT',
+        price: '123121',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'pre_order',
+      shippingDetail: {
+        endDate: '2024-07-09',
+        shipDuration: '123',
+        startDate: '2024-07-10',
+      },
+      productDetail: {
+        condition: 'brand_new',
+        price: '3123',
+        quantity: '5',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'pre_order',
+      shippingDetail: {
+        endDate: '2024-07-24',
+        shipDuration: '33',
+        startDate: '2024-07-27',
+      },
+      productDetail: {
+        condition: 'brand_new',
+        price: '123',
+        quantity: '3',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'pre_order',
+      shippingDetail: {
+        endDate: '2024-07-09',
+        shipDuration: '3122',
+        startDate: '2024-07-05',
+      },
+      productDetail: {
+        condition: 'brand_new',
+        price: '123',
+        quantity: '4',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'pre_order',
+      shippingDetail: {
+        endDate: '2024-07-09',
+        shipDuration: '3122',
+        startDate: '2024-07-05',
+      },
+      productDetail: {
+        condition: 'brand_new',
+        price: '123',
+        quantity: '4',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'pre_order',
+      shippingDetail: {
+        endDate: '2024-07-09',
+        shipDuration: '3122',
+        startDate: '2024-07-05',
+      },
+      productDetail: {
+        condition: 'brand_new',
+        price: '123',
+        quantity: '4',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+    {
+      category: 'collectibles',
+      type: 'pre_order',
+      shippingDetail: {
+        endDate: '2024-07-09',
+        shipDuration: '3122',
+        startDate: '2024-07-05',
+      },
+      productDetail: {
+        condition: 'brand_new',
+        price: '123',
+        quantity: '4',
+        size: 'ONE_SIZE',
+      },
+      name: 'Nike Dunk Low Retro White Black',
+    },
+  ]);
 
   const isItemsEmpty = items.length === 0;
   const category = watch('category');
