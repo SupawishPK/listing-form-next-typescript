@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Tabs from '../components/Tabs';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import Chip from '../components/Chip';
 import { DevTool } from '@hookform/devtools';
 import InformationCircle from '../assets/icons/information-circle.svg';
@@ -63,7 +63,9 @@ const preOrderFormSchema = z.object({
 
 const listingFormSchema = z
   .object({
-    category: z.string().min(1, 'Category is required'),
+    category: z
+      .enum(['shoes', 'apparel', 'accessories', 'collectibles', 'bags'])
+      .refine((val) => val !== null, { message: 'Category is required' }),
   })
   .and(z.union([placeAskFormSchema, preOrderFormSchema]));
 
@@ -193,8 +195,8 @@ const Home = () => {
     getValues,
     handleSubmit,
     register,
-    reset,
     setValue,
+    reset,
     watch,
   } = useForm<IListingFormType>({
     resolver: zodResolver(listingFormSchema),
@@ -217,9 +219,32 @@ const Home = () => {
   const [items, setItems] = useState<IItems>([]);
 
   const isItemsEmpty = items.length === 0;
+  const category = watch('category');
 
-  const sizeOptions = getSizeOptionsByCategory(watch('category'));
-  const equipmentOptions = getEquipmentOptionsByCategory(watch('category'));
+  const sizeOptions = useMemo(
+    () => getSizeOptionsByCategory(category),
+    [category]
+  );
+
+  const equipmentOptions = useMemo(
+    () => getEquipmentOptionsByCategory(category),
+    [category]
+  );
+
+  useEffect(() => {
+    const category = getValues('category');
+    reset({
+      category: category,
+      type: 'place_ask',
+      productDetail: {
+        size: '',
+        condition: '',
+        equipment: '',
+        price: '',
+      },
+    });
+    clearErrors();
+  }, [category, clearErrors, getValues, reset]);
 
   if (!isClient) return null;
 
@@ -231,7 +256,11 @@ const Home = () => {
         name: 'Nike Dunk Low Retro White Black',
       },
     ]);
+    const category = data.category;
+    const type = data.type;
     reset();
+    setValue('type', type);
+    setValue('category', category);
   };
 
   const onChangeTap = (index: number) => {
@@ -275,14 +304,13 @@ const Home = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className='py-8 pt-6 bg-gray-light-2'>
-        <div className='grid grid-cols-2'>
-          <section className='pl-20 pr-3'>
+        <div className='grid grid-cols-8'>
+          <section className='col-span-3 pl-20 pr-3'>
             <form onSubmit={handleSubmit(onSubmit)}>
               <h1 className='text-3xl font-bold'>Add listing</h1>
               <div className='flex flex-col gap-6 mt-12'>
                 <div className='flex flex-col gap-8 px-6 py-8 bg-white rounded-2xl'>
                   <h2 className='text-lg font-bold'>Search a product to add</h2>
-
                   <Select
                     {...register('category')}
                     variant='bordered'
@@ -291,12 +319,6 @@ const Home = () => {
                     isInvalid={errors.category?.message !== undefined}
                     errorMessage={errors.category?.message}
                     fullWidth
-                    onChange={(e) => {
-                      const category = e.target.value;
-                      reset();
-                      setValue('category', category);
-                      clearErrors();
-                    }}
                   >
                     {Category.map(({ label, value }) => (
                       <SelectItem key={value} value={value}>
@@ -606,7 +628,7 @@ const Home = () => {
             <DevTool control={control} />
           </section>
 
-          <section className='flex flex-col gap-6 pl-3 pr-6'>
+          <section className='flex flex-col col-span-5 gap-6 pl-3 pr-6'>
             <div className='flex'>
               <div className='grow'>
                 <p className='text-sm text-gray'>Total</p>

@@ -9,8 +9,21 @@ import {
 import DocumentIcon from '../assets/icons/document.svg';
 import Nike from '../assets/nike.jpeg';
 import Image from 'next/image';
+import mapSizeToDisplay from '../utils/mapSizeToDisplay';
+import mapConditionToDisplay from '../utils/mapConditionToDisplay';
+import displayPriceFormat from '../utils/displayPriceFormat';
+import { Chip } from '@nextui-org/chip';
+import displayTypeFormat from '../utils/displayTypeFormat';
+
+export type ICategory =
+  | 'shoes'
+  | 'apparel'
+  | 'accessories'
+  | 'collectibles'
+  | 'bags';
 
 interface IPlaceAskItem {
+  category: ICategory;
   type: 'place_ask';
   name: string;
   productDetail: {
@@ -22,6 +35,7 @@ interface IPlaceAskItem {
 }
 
 interface IPreOrderItem {
+  category: ICategory;
   type: 'pre_order';
   name: string;
   productDetail: {
@@ -37,7 +51,7 @@ interface IPreOrderItem {
   };
 }
 
-type IItem = IPlaceAskItem | IPreOrderItem;
+export type IItem = IPlaceAskItem | IPreOrderItem;
 
 export type IItems = IItem[];
 
@@ -52,17 +66,22 @@ const ItemTable = ({ items }: IProps) => {
       selectionMode='multiple'
       removeWrapper
       classNames={{
-        thead: 'bg-white',
-        th: 'text-black font-bold',
         tbody: 'bg-white',
+        td: 'py-6 odd:bg-gray-100',
+        th: 'text-black font-bold',
+        tr: 'even:bg-gray-light',
       }}
     >
       <TableHeader>
         <TableColumn>PRODUCT NAME</TableColumn>
         <TableColumn>PRODUCT DETAIL</TableColumn>
         <TableColumn>PRICE</TableColumn>
-        <TableColumn>QUANTITY</TableColumn>
-        <TableColumn>STATUS</TableColumn>
+        <TableColumn>
+          <div className='flex justify-center'>QUANTITY</div>
+        </TableColumn>
+        <TableColumn>
+          <div className='flex justify-center'>TYPE</div>
+        </TableColumn>
       </TableHeader>
       <TableBody
         emptyContent={
@@ -90,13 +109,36 @@ const ItemTable = ({ items }: IProps) => {
               </div>
             </TableCell>
             <TableCell>
-              {item.productDetail.size}| {item.productDetail.condition}
+              {mapSizeToDisplay(item.productDetail.size, item.category)} |{' '}
+              {mapConditionToDisplay(item.productDetail.condition)}
             </TableCell>
-            <TableCell>{item.productDetail.price}</TableCell>
             <TableCell>
-              {item.type === 'pre_order' ? item.productDetail.quantity : 1}
+              {displayPriceFormat(item.productDetail.price)}
             </TableCell>
-            <TableCell>{item.type}</TableCell>
+            <TableCell>
+              <div className='flex justify-center'>
+                {item.type === 'pre_order' ? item.productDetail.quantity : 1}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className='flex justify-center'>
+                <Chip
+                  classNames={
+                    item.type === 'place_ask'
+                      ? {
+                          base: 'bg-blue-light',
+                          content: 'text-blue text-xs font-bold',
+                        }
+                      : {
+                          base: 'bg-green-light',
+                          content: 'text-green-dark text-xs font-bold',
+                        }
+                  }
+                >
+                  {displayTypeFormat(item.type)}
+                </Chip>
+              </div>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
