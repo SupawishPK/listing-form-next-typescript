@@ -1,6 +1,7 @@
 - Next.js
-- Typescript
-- React hook form
+- TypeScript
+- React Hook Form
+- Zod
 
 # Getting Started
 

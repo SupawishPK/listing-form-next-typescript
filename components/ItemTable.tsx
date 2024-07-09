@@ -9,8 +9,10 @@ import {
 import DocumentIcon from '../assets/icons/document.svg';
 import Nike from '../assets/nike.jpeg';
 import Image from 'next/image';
-import mapSizeToDisplay from '../utils/mapSizeToDisplay';
-import mapConditionToDisplay from '../utils/mapConditionToDisplay';
+import ShoesSize from '../mocks/shoes-size.json';
+import ApparelSize from '../mocks/apparel-size.json';
+import BagAccessoriesCollectiblesSize from '../mocks/bags-accessories-collectibles-size.json';
+import Condition from '../mocks/condition.json';
 import displayPriceFormat from '../utils/displayPriceFormat';
 import { Chip } from '@nextui-org/chip';
 import displayTypeFormat from '../utils/displayTypeFormat';
@@ -18,6 +20,7 @@ import { useCallback, useMemo, useState } from 'react';
 import leftFilledIcon from '../assets/icons/leftFilled.svg';
 import rightFilledIcon from '../assets/icons/rightFilled.svg';
 import { Button } from '@nextui-org/button';
+import { Select, SelectItem } from '@nextui-org/select';
 
 export type ICategory =
   | 'shoes'
@@ -63,9 +66,37 @@ interface IProps {
   items: IItems;
 }
 
+const mapConditionToDisplay = (condition: string) => {
+  return Condition.find((item) => item.value === condition)?.label ?? condition;
+};
+
+const mapSizeToDisplay = (brand: string, category: ICategory) => {
+  let displayBrand = '';
+  switch (category) {
+    case 'shoes':
+      displayBrand =
+        ShoesSize.find((item) => item.size === brand)?.sizeText ?? brand;
+      break;
+    case 'apparel':
+      displayBrand =
+        ApparelSize.find((item) => item.size === brand)?.sizeText ?? brand;
+      break;
+    case 'accessories':
+    case 'collectibles':
+    case 'bags':
+      displayBrand =
+        BagAccessoriesCollectiblesSize.find((item) => item.size === brand)
+          ?.sizeText ?? brand;
+      break;
+    default:
+      displayBrand = brand;
+  }
+  return displayBrand;
+};
+
 const ItemTable = ({ items }: IProps) => {
   const [page, setPage] = useState(1);
-  const rowsPerPage = 3;
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const pages = Math.ceil(items.length / rowsPerPage);
 
   const onNextPage = useCallback(() => {
@@ -82,10 +113,27 @@ const ItemTable = ({ items }: IProps) => {
 
   const bottomContent = useMemo(() => {
     return (
-      <div className='flex items-center justify-end pb-5 -mt-4 bg-white gap-7 rounded-b-xl'>
-        <p className='text-xs text-gray'>
-          Rows per page: <b className='font-medium text-black'>{rowsPerPage}</b>
-        </p>
+      <div className='flex items-center justify-end py-5 -mt-4 bg-white gap-7 rounded-b-xl'>
+        <div className='flex items-center min-w-56'>
+          <p className='w-full text-xs text-gray'>Rows per page:</p>
+          <Select
+            items={[
+              { value: 5, label: '5' },
+              { value: 10, label: '10' },
+              { value: 15, label: '15' },
+              { value: 20, label: '20' },
+            ]}
+            size='sm'
+            className='bg-white'
+            defaultSelectedKeys={rowsPerPage.toString()}
+            onChange={(selected) => {
+              setRowsPerPage(Number(selected.target.value));
+              setPage(1);
+            }}
+          >
+            {(item) => <SelectItem key={item.value}>{item.label}</SelectItem>}
+          </Select>
+        </div>
         <p className='text-xs font-medium'>
           {`${(page - 1) * rowsPerPage + 1}-${
             page * rowsPerPage > items.length
