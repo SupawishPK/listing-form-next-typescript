@@ -8,7 +8,7 @@ import UploadIcon from '../assets/icons/upload.svg';
 import PencilIcon from '../assets/icons/pencil.svg';
 import RightFilledIcon from '../assets/icons/rightFilled.svg';
 import Conditions from '../mocks/condition.json';
-import Quantity from '../mocks/Quantity.json';
+import Quantity from '../mocks/quantity.json';
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
