@@ -281,6 +281,7 @@ const Home = () => {
       },
     ]);
     reset();
+    window.scrollTo(0, 0);
   };
 
   const onChangeTap = (index: number) => {
